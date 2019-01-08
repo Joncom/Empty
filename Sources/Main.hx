@@ -1,27 +1,34 @@
 package;
 
-import kha.Assets;
-import kha.Framebuffer;
-import kha.Scheduler;
-import kha.System;
-
 class Main {
-	static function update(): Void {
-
-	}
-
-	static function render(framebuffer: Framebuffer): Void {
-
-	}
-
 	public static function main() {
-		System.start({title: "Kha", width: 800, height: 600}, function (_) {
-			// Just loading everything is ok for small projects
-			Assets.loadEverything(function () {
-				// Avoid passing update/render directly,
-				// so replacing them via code injection works
-				Scheduler.addTimeTask(function () { update(); }, 0, 1 / 60);
-				System.notifyOnFrames(function (framebuffers) { render(framebuffers[0]); });
+		kha.System.start({}, function(window) {
+			kha.Assets.loadEverything(function() {
+				var image:kha.Image = kha.Assets.images.custom_04b03;
+				var copy:kha.Image = kha.Image.createRenderTarget(image.width, image.height);
+				copy.g2.begin(true, kha.Color.Transparent);
+				copy.g2.drawImage(image, 0, 0);
+				copy.g2.end();
+				var bytes = copy.getPixels();
+				var i = 0;
+				for (y in 0...image.height) {
+					for (x in 0...image.width) {
+						var alpha = bytes.get((y * image.width + x) * 4 + 3);
+						if (alpha > 0) {
+							i++;
+						}
+					}
+				}
+				if (i > 0) {
+					trace("Found some data");
+				} else {
+					trace("Found NO data");
+				}
+				kha.System.notifyOnFrames(function render(framebuffers:Array<kha.Framebuffer>):Void {
+					var framebuffer = framebuffers[0];
+					framebuffer.g2.begin();
+					framebuffer.g2.end();
+				});
 			});
 		});
 	}
