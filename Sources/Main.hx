@@ -22,6 +22,7 @@ class Main {
 				// so replacing them via code injection works
 				Scheduler.addTimeTask(function () { update(); }, 0, 1 / 60);
 				System.notifyOnFrames(function (framebuffers) { render(framebuffers[0]); });
+				trace("White Color: " + kha.Color.White);
 			});
 		});
 	}
